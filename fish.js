@@ -1,7 +1,7 @@
 var fish;
 S(document).ready(function(){
 
-	fish = new Fish('fish');
+	fish = new Fish('fish',600,400);
 
 	// Create an initial fish
 	fish.update();
@@ -14,17 +14,14 @@ S(document).ready(function(){
 
 });
 
-function Fish(id){
+function Fish(id,w,h){
 	
-	this.id = id;
-	this.paper = new SVG(this.id);
-	w = this.paper.w;
-	h = this.paper.h;
 	this.aspectratio = w/h;
-
+	this.id = id;
 	this.rounded = Math.random();
-	
-	var points;
+
+	var points = new Array(10);
+
 	var eye;
 	var path = "";
 	var colours = {
@@ -52,15 +49,20 @@ function Fish(id){
 	// We'll need to change the sizes when the window changes size
 	window.addEventListener('resize', function(event){ _obj.resize(); });
 
-	this.resize = function(){
+	this.size = function(){
 		S('#'+this.id).css({'height':''});
 		w = S('#'+this.id)[0].offsetWidth;
 		S('#'+this.id).css({'height':(w/this.aspectratio)+'px'});
 		this.paper = new SVG(this.id);
 		w = this.paper.w;
 		h = this.paper.h;
+		return this;
+	}
+	this.resize = function(){
+		this.size();
 		this.paper.clear();
 		this.draw();
+		return this;
 	}
 	this.update = function(){ this.create().draw(); }
 	this.create = function(){
@@ -151,5 +153,7 @@ function Fish(id){
 		return this;
 
 	}
+	this.size();
+
 	return this;
 }
