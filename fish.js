@@ -20,9 +20,7 @@ function Fish(id,w,h){
 	this.id = id;
 	this.rounded = Math.random();
 
-	var points = new Array(10);
-
-	var eye;
+	var points,eye,patterns;
 	var path = "";
 	var colours = {
 		"c1": { "bg": "#2254F4", "text": "white" },
@@ -68,12 +66,15 @@ function Fish(id,w,h){
 	this.create = function(){
 
 		this.paper.clear();
-		this.colour = colours['c'+Math.ceil(Math.random()*14)].bg;
+		var c = 'c'+Math.ceil(Math.random()*14);
+		this.colour = c;
+		this.colour2 = colours[c].text;
 		
 		front = inRange(0.1,0.9);
 		back = inRange(0.1,0.9);
 
 		points = new Array(10);
+		patterns = new Array();
 
 		// Start with nose
 		points[0] = { x: 0.1, y: 0.5 - front*(Math.random()-0.5)*0.5 };
@@ -99,6 +100,13 @@ function Fish(id,w,h){
 		points[6] = {x: 0.9,y: 0.6 };
 
 		eye = { x: points[0].x + (points[2].x-points[0].x)*0.75, y: (points[1].y - inRange(0,0.6)*Math.abs(points[2].y - points[1].y)) };
+
+		if(Math.random() > 0.8) patterns.push({'pattern':getPattern('belly'),'attr':{'stroke-width':0,'stroke':'none','fill':this.colour2,'opacity':0.6}});
+		else {
+			if(Math.random() > 0.9) patterns.push({'pattern':getPattern('face'),'attr':{'stroke-width':0,'stroke':'none','fill':'black','opacity':0.7}});
+			if(Math.random() > 0.7) patterns.push({'pattern':getPattern('stripes'),'attr':{'stroke-width':Math.round(w*0.02),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
+		}
+
 
 		return this;
 	}
@@ -145,7 +153,14 @@ function Fish(id,w,h){
 		}	
 		path += '';
 
-		this.paper.path(path).attr({'stroke':0,'fill':this.colour});
+		this.paper.clip({'type':'path','d':path,'id':'shape'});
+		this.paper.path(path).attr({'stroke':0,'fill':colours[this.colour].bg,'clip-path':'shape'});
+		if(patterns.length > 0){
+			for(var i = 0; i < patterns.length; i++){
+				patterns[i].attr['clip-path'] = 'shape';
+				this.paper.path(patterns[i].pattern).attr(patterns[i].attr);
+			}
+		}
 		this.paper.circle(eye.x*w, eye.y*h, w*0.02).attr({'stroke':0,'fill':'white'});
 		this.paper.circle(eye.x*w, eye.y*h, w*0.015).attr({'stroke':0,'fill':'black'});
 		
@@ -153,6 +168,38 @@ function Fish(id,w,h){
 		return this;
 
 	}
+	
+	function getPattern(t){
+		if(t == "stripes"){
+			var dy;
+			var r = Math.random();
+			var n = Math.max(3,Math.round(Math.random()*6));
+			var sep = 0.04;
+			var str = '';
+			var angle = Math.random()*0.25;
+			var half = (Math.random()>0.5) ? true : false;
+			var tall = (half) ? h/2 : h;
+			var dy = sep*w*Math.cos(angle)*Math.sin(angle);
+			for(var i = 0, x = points[2].x; i < n ; i++, x += sep){
+				str += 'M'+Math.round(w*x)+',0l'+(tall*Math.tan(angle))+','+tall;
+				tall -= dy;
+			}
+			if(half){
+				for(var i = 0, x = points[3].x; i < n ; i++, x -= sep){
+					str += 'M'+Math.round(w*x)+','+h+'l-'+(tall*Math.tan(angle))+',-'+tall;
+					tall -= dy;
+				}
+			}
+			return str;
+		}else if(t == "belly"){
+			return 'M0,'+h+'L'+Math.round(points[2].x*w)+','+(h/2)+'L'+w+','+(h/2)+'L'+w+','+h+'Z';
+		}else if(t == "face"){
+			return 'M0,0L'+Math.round(points[2].x*w)+',0l0,'+h+'L0,'+h+'Z';
+		}else{
+			return '';
+		}
+	}
+	
 	this.size();
 
 	return this;
