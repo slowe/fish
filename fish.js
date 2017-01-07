@@ -107,7 +107,6 @@ function Fish(id,w,h){
 			if(Math.random() > 0.7) patterns.push({'pattern':getPattern('stripes'),'attr':{'stroke-width':Math.round(w*0.02),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
 		}
 
-
 		return this;
 	}
 	
