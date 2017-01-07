@@ -115,7 +115,7 @@ function Fish(id,w,h){
 			if(Math.random() > 0.9) patterns.push({'pattern':getPattern('face'),'attr':{'stroke-width':0,'stroke':'none','fill':'black','opacity':0.7}});
 			if(Math.random() > 0.7) patterns.push({'pattern':getPattern('stripes'),'attr':{'stroke-width':Math.round(w*0.02),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
 			else{
-				if(Math.random() > 0.2) patterns.push({'pattern':getPattern('lines'),'attr':{'stroke-width':Math.round(w*0.01),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
+				if(Math.random() > 0.7) patterns.push({'pattern':getPattern('lines'),'attr':{'stroke-width':Math.round(w*0.01),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
 			}
 		}
 
