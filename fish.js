@@ -116,6 +116,9 @@ function Fish(id,w,h){
 			if(Math.random() > 0.7) patterns.push({'pattern':getPattern('stripes'),'attr':{'stroke-width':Math.round(w*0.02),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
 			else{
 				if(Math.random() > 0.7) patterns.push({'pattern':getPattern('lines'),'attr':{'stroke-width':Math.round(w*0.01),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
+				else{
+					if(Math.random() > 0.8) patterns.push({'circles':getPattern('circles'),'attr':{'stroke-width':Math.round(w*0.008),'stroke':this.colour2,'fill':'none','opacity':0.8}});
+				}
 			}
 		}
 
@@ -175,7 +178,13 @@ function Fish(id,w,h){
 		if(patterns.length > 0){
 			for(var i = 0; i < patterns.length; i++){
 				patterns[i].attr['clip-path'] = 'shape';
-				this.paper.path(patterns[i].pattern).attr(patterns[i].attr);
+				if(patterns[i].pattern){
+					this.paper.path(patterns[i].pattern).attr(patterns[i].attr);
+				}else if(patterns[i].circles){
+					for(var c = 0; c < patterns[i].circles.length; c++){
+						this.paper.circle(patterns[i].circles[c].x,patterns[i].circles[c].y,patterns[i].circles[c].r).attr(patterns[i].attr);
+					}
+				}
 			}
 		}
 		this.paper.circle(eye.x*w, eye.y*h, w*0.02).attr({'stroke':0,'fill':'white'});
@@ -224,9 +233,23 @@ function Fish(id,w,h){
 					x += (dx + 0.02);
 				}
 				tall -= dy;
-				console.log(tall)
 			}
 			return str;
+		}else if(t == "circles"){
+			var x,y;
+			var r = random(0.04,0.06);
+			var circles = new Array();
+			var f = r*2*Math.cos(Math.PI*30/180);
+			var x = points[2].x - r/2;
+			for(var i = 0; i < (points[3].x-points[2].x)/(r*2); i++){
+				x += f;
+				y = points[2].y - r - (i%2 == 0 ? r : 0);
+				for(var j = 0; j < (points[9].y-points[3].y)/(r*2); j++){
+					y += r*2;
+					if(Math.random() > 0.1) circles.push({'x': x*w, 'y': y*w, 'r': r*w});
+				}
+			}
+			return circles;
 		}else if(t == "belly"){
 			return 'M0,'+h+'L'+Math.round(points[2].x*w)+','+(h/2)+'L'+w+','+(h/2)+'L'+w+','+h+'Z';
 		}else if(t == "face"){
