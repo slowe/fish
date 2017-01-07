@@ -42,6 +42,10 @@ function Fish(id,w,h){
 	function inRange(lo,hi){
 		return Math.min(Math.max(lo,Math.random()),hi);
 	}
+	function random(lo,hi){
+		return Math.random()*(hi-lo)+lo;
+	}
+		
 
 	var _obj = this;
 	// We'll need to change the sizes when the window changes size
@@ -72,12 +76,16 @@ function Fish(id,w,h){
 		
 		front = inRange(0.1,0.9);
 		back = inRange(0.1,0.9);
+		back2 = inRange(0.1,0.9);
+		tail = random(0,0.05);
+		tailend = random(0.025,0.05);
+		nose = random(-0.05,0.05);
 
 		points = new Array(10);
 		patterns = new Array();
 
 		// Start with nose
-		points[0] = { x: 0.1, y: 0.5 - front*(Math.random()-0.5)*0.5 };
+		points[0] = { x: 0.1 - nose, y: 0.5 - front*(Math.random()-0.5)*0.5 };
 		points[1] = { x: points[0].x, y: points[0].y - front*Math.random()*0.2 };
 
 		// Slightly move top of nose forwards
@@ -88,16 +96,16 @@ function Fish(id,w,h){
 		points[9] = {x: 0.3, y:((1 + front)/2)};
 
 		// Add end of body
-		points[3] = {x: 0.7, y: ((1 - back)/2)};
-		points[8] = {x: 0.7, y: 0.8};
+		points[3] = {x: 0.7, y: ((1 - back)/2) };
+		points[8] = {x: 0.7, y: 0.75+random(0,0.15) };
 
 		// Add start of tail
-		points[4] = {x: 0.83, y: 0.45 };
-		points[7] = {x: 0.83, y: 0.55 };
+		points[4] = {x: 0.83, y: 0.45 + tail };
+		points[7] = {x: 0.83, y: 0.55 - tail };
 
-		// Add start of tail
-		points[5] = {x: 0.9,y: 0.4 };
-		points[6] = {x: 0.9,y: 0.6 };
+		// Add end of tail
+		points[5] = {x: 0.875 + tailend,y: 0.4 };
+		points[6] = {x: 0.875 + tailend,y: 0.6 };
 
 		eye = { x: points[0].x + (points[2].x-points[0].x)*0.75, y: (points[1].y - inRange(0,0.6)*Math.abs(points[2].y - points[1].y)) };
 
@@ -135,7 +143,9 @@ function Fish(id,w,h){
 				path += Math.round(w*(points[i-1].x + dx))+','+Math.round(h*(points[i-1].y + dy))+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y)+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y);
 			}else if(i == 8){
 				path += 'C';
-				path += Math.round(w*points[i-1].x)+','+Math.round(h*points[i-1].y)+' '+Math.round(w*(points[i].x+0.1*this.rounded))+','+Math.round(h*points[i].y)+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y);
+				dx = 0.1*this.rounded;
+				dy = bodygrad2*dx;
+				path += Math.round(w*points[i-1].x)+','+Math.round(h*points[i-1].y)+' '+Math.round(w*(points[i].x + dx))+','+Math.round(h*(points[i].y + dy))+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y);
 			}else if(i == 10){
 				path += 'C';
 				dx = -0.15*this.rounded;
