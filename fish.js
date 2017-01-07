@@ -75,6 +75,7 @@ function Fish(id,w,h){
 		this.colour2 = colours[c].text;
 		
 		front = inRange(0.1,0.9);
+		head = random(0,0.1);
 		back = inRange(0.1,0.9);
 		back2 = inRange(0.1,0.9);
 		tail = random(0,0.05);
@@ -92,12 +93,12 @@ function Fish(id,w,h){
 		points[1].x -= (1-Math.pow(front,2))*0.02;
 
 		// Add head
-		points[2] = {x: 0.3, y:((1 - front)/2)};
-		points[9] = {x: 0.3, y:((1 + front)/2)};
+		points[2] = {x: 0.3 + head, y:((1 - front)/2)};
+		points[9] = {x: 0.3 + head, y:((1 + front)/2)};
 
 		// Add end of body
 		points[3] = {x: 0.7, y: ((1 - back)/2) };
-		points[8] = {x: 0.7, y: 0.75+random(0,0.15) };
+		points[8] = {x: 0.7, y: 0.75+random(-0.15,0.15) };
 
 		// Add start of tail
 		points[4] = {x: 0.83, y: 0.45 + tail };
@@ -131,7 +132,11 @@ function Fish(id,w,h){
 				path += 'C';
 				dx = -0.2 * this.rounded;
 				dy = bodygrad1*dx;
-				if(Math.abs(points[2].y - points[1].y) < 0.05){
+				dy2 = Math.abs(points[2].y - points[1].y);
+				if(dy2 < 0.15){
+					dx *= 0.5;
+					dy *= 0.5;
+				}else if(dy2 < 0.05){
 					dx = 0;
 					dy = 0;
 				}
