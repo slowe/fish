@@ -114,6 +114,9 @@ function Fish(id,w,h){
 		else {
 			if(Math.random() > 0.9) patterns.push({'pattern':getPattern('face'),'attr':{'stroke-width':0,'stroke':'none','fill':'black','opacity':0.7}});
 			if(Math.random() > 0.7) patterns.push({'pattern':getPattern('stripes'),'attr':{'stroke-width':Math.round(w*0.02),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
+			else{
+				if(Math.random() > 0.2) patterns.push({'pattern':getPattern('lines'),'attr':{'stroke-width':Math.round(w*0.01),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
+			}
 		}
 
 		return this;
@@ -203,6 +206,25 @@ function Fish(id,w,h){
 					str += 'M'+Math.round(w*x)+','+h+'l-'+(tall*Math.tan(angle))+',-'+tall;
 					tall -= dy;
 				}
+			}
+			return str;
+		}else if(t == "lines"){
+			var dy,dx;
+			var r = Math.random();
+			var n = Math.max(5,Math.round(Math.random()*20));
+			var dy = 0.03*h;
+			var str = '';
+			var tall = (h/2)+(random(0,0.4)*h);
+			for(var i = 0; i < n ; i++){
+				x = points[2].x + random(0,0.1);
+				while(x < points[3].x){
+					dx = Math.random()*(points[3].x-points[2].x);
+					x2 = Math.min(x + dx,points[4].x)-x;
+					str += 'M'+Math.round(w*x)+','+(tall)+'l'+Math.round(w*x2)+',0';
+					x += (dx + 0.02);
+				}
+				tall -= dy;
+				console.log(tall)
 			}
 			return str;
 		}else if(t == "belly"){
