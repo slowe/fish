@@ -58,6 +58,9 @@ function Fish(id,w,h){
 		this.paper = new SVG(this.id);
 		w = this.paper.w;
 		h = this.paper.h;
+
+		this.transform = {'type':'scale','props':{x:w,y:h,cx:w,cy:h,r:w,'stroke-width':w}};
+		
 		return this;
 	}
 	this.resize = function(){
@@ -113,11 +116,11 @@ function Fish(id,w,h){
 		if(Math.random() > 0.8) patterns.push({'pattern':getPattern('belly'),'attr':{'stroke-width':0,'stroke':'none','fill':this.colour2,'opacity':0.6}});
 		else {
 			if(Math.random() > 0.9) patterns.push({'pattern':getPattern('face'),'attr':{'stroke-width':0,'stroke':'none','fill':'black','opacity':0.7}});
-			if(Math.random() > 0.7) patterns.push({'pattern':getPattern('stripes'),'attr':{'stroke-width':Math.round(w*0.02),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
+			if(Math.random() > 0.7) patterns.push({'pattern':getPattern('stripes'),'attr':{'stroke-width':0.02,'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
 			else{
-				if(Math.random() > 0.7) patterns.push({'pattern':getPattern('lines'),'attr':{'stroke-width':Math.round(w*0.01),'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
+				if(Math.random() > 0.7) patterns.push({'pattern':getPattern('lines'),'attr':{'stroke-width':0.01,'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
 				else{
-					if(Math.random() > 0.8) patterns.push({'circles':getPattern('circles'),'attr':{'stroke-width':Math.round(w*0.008),'stroke':this.colour2,'fill':'none','opacity':0.8}});
+					if(Math.random() > 0) patterns.push({'circles':getPattern('circles'),'attr':{'stroke-width':0.008,'stroke':this.colour2,'fill':'none','opacity':0.8}});
 				}
 			}
 		}
@@ -128,14 +131,12 @@ function Fish(id,w,h){
 	this.draw = function(){
 
 		// Move to start
-		path = 'M'+	Math.round(points[0].x)+','+Math.round(points[0].y);
+		path = [['M',[Math.round(w*points[0].x),Math.round(h*points[0].y)]]];
 		bodygrad1 = (points[3].y - points[2].y)/(points[3].x - points[2].x);
 		bodygrad2 = (points[9].y - points[8].y)/(points[9].x - points[8].x);
 
-
 		for(var i = 0; i <= points.length; i++){
 			if(i == 2){
-				path += 'C';
 				dx = -0.2 * this.rounded;
 				dy = bodygrad1*dx;
 				dy2 = Math.abs(points[2].y - points[1].y);
@@ -146,49 +147,47 @@ function Fish(id,w,h){
 					dx = 0;
 					dy = 0;
 				}
-				path += Math.round(w*(points[i-1].x))+','+Math.round(h*(points[i-1].y))+' '+Math.round(w*(points[i].x + dx))+','+Math.round(h*(points[i].y + dy))+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y);
+				path.push(['C',[Math.round(w*(points[i-1].x)),Math.round(h*(points[i-1].y)),Math.round(w*(points[i].x + dx)),Math.round(h*(points[i].y + dy)),Math.round(w*points[i].x),Math.round(h*points[i].y)]]);
 			}else if(i == 4){
-				path += 'C';
 				dx = 0.1*this.rounded;
 				dy = bodygrad1*dx;
-				path += Math.round(w*(points[i-1].x + dx))+','+Math.round(h*(points[i-1].y + dy))+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y)+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y);
+				path.push(['C',[Math.round(w*(points[i-1].x + dx)),Math.round(h*(points[i-1].y + dy)),Math.round(w*points[i].x),Math.round(h*points[i].y),Math.round(w*points[i].x),Math.round(h*points[i].y)]]);
 			}else if(i == 8){
-				path += 'C';
 				dx = 0.1*this.rounded;
 				dy = bodygrad2*dx;
-				path += Math.round(w*points[i-1].x)+','+Math.round(h*points[i-1].y)+' '+Math.round(w*(points[i].x + dx))+','+Math.round(h*(points[i].y + dy))+' '+Math.round(w*points[i].x)+','+Math.round(h*points[i].y);
+				path.push(['C',[Math.round(w*points[i-1].x),Math.round(h*points[i-1].y),Math.round(w*(points[i].x + dx)),Math.round(h*(points[i].y + dy)),Math.round(w*points[i].x),Math.round(h*points[i].y)]]);
 			}else if(i == 10){
-				path += 'C';
 				dx = -0.15*this.rounded;
 				dy = bodygrad2*dx;
 				if(Math.abs(points[0].y - points[9].y) < 0.05){
 					dx = 0;
 					dy = 0;
 				}
-				path += Math.round(w*(points[i-1].x + dx))+','+Math.round(h*(points[i-1].y + dy))+' '+Math.round(w*points[0].x)+','+Math.round(h*points[0].y)+' '+Math.round(w*points[0].x)+','+Math.round(h*points[0].y);
+				path.push(['C',[Math.round(w*(points[i-1].x + dx)),Math.round(h*(points[i-1].y + dy)),Math.round(w*points[0].x),Math.round(h*points[0].y),Math.round(w*points[0].x),Math.round(h*points[0].y)]]);
 			}else{
-				path += 'L';
-				path += Math.round(w*points[i].x)+','+Math.round(h*points[i].y);
+				path.push(['L',[Math.round(w*points[i].x),Math.round(h*points[i].y)]]);
 			}
-		}	
-		path += '';
+		}
 
-		this.paper.clip({'type':'path','d':path,'id':'shape'});
+		this.paper.clip({'type':'path','path':path,'id':'shape'});
 		this.paper.path(path).attr({'stroke':0,'fill':colours[this.colour].bg,'clip-path':'shape'});
+
+		
 		if(patterns.length > 0){
 			for(var i = 0; i < patterns.length; i++){
 				patterns[i].attr['clip-path'] = 'shape';
 				if(patterns[i].pattern){
-					this.paper.path(patterns[i].pattern).attr(patterns[i].attr);
+					console.log(patterns[i].pattern)
+					this.paper.path(patterns[i].pattern).attr(patterns[i].attr).transform(this.transform);
 				}else if(patterns[i].circles){
 					for(var c = 0; c < patterns[i].circles.length; c++){
-						this.paper.circle(patterns[i].circles[c].x,patterns[i].circles[c].y,patterns[i].circles[c].r).attr(patterns[i].attr);
+						this.paper.circle(patterns[i].circles[c].cx,patterns[i].circles[c].cy,patterns[i].circles[c].r).attr(patterns[i].attr).transform(this.transform);
 					}
 				}
 			}
 		}
-		this.paper.circle(eye.x*w, eye.y*h, w*0.02).attr({'stroke':0,'fill':'white'});
-		this.paper.circle(eye.x*w, eye.y*h, w*0.015).attr({'stroke':0,'fill':'black'});
+		this.paper.circle(eye.x, eye.y, 0.02).attr({'stroke':0,'fill':'white'}).transform(this.transform);
+		this.paper.circle(eye.x, eye.y, 0.015).attr({'stroke':0,'fill':'black'}).transform(this.transform);
 		
 		this.paper.draw();
 		return this;
@@ -196,23 +195,23 @@ function Fish(id,w,h){
 	}
 	
 	function getPattern(t){
+		var str = '';
 		if(t == "stripes"){
 			var dy;
 			var r = Math.random();
 			var n = Math.max(3,Math.round(Math.random()*6));
 			var sep = 0.04;
-			var str = '';
 			var angle = Math.random()*0.25;
 			var half = (Math.random()>0.5) ? true : false;
-			var tall = (half) ? h/2 : h;
-			var dy = sep*w*Math.cos(angle)*Math.sin(angle);
+			var tall = (half) ? 1/2 : 1;
+			var dy = sep*Math.cos(angle)*Math.sin(angle);
 			for(var i = 0, x = points[2].x; i < n ; i++, x += sep){
-				str += 'M'+Math.round(w*x)+',0l'+(tall*Math.tan(angle))+','+tall;
+				str += 'M'+(x).toFixed(2)+',0l'+(tall*Math.tan(angle)).toFixed(2)+','+tall.toFixed(2);
 				tall -= dy;
 			}
 			if(half){
 				for(var i = 0, x = points[3].x; i < n ; i++, x -= sep){
-					str += 'M'+Math.round(w*x)+','+h+'l-'+(tall*Math.tan(angle))+',-'+tall;
+					str += 'M'+(x).toFixed(2)+','+h.toFixed(2)+'l-'+(tall*Math.tan(angle)).toFixed(2)+',-'+tall.toFixed(2);
 					tall -= dy;
 				}
 			}
@@ -221,15 +220,14 @@ function Fish(id,w,h){
 			var dy,dx;
 			var r = Math.random();
 			var n = Math.max(5,Math.round(Math.random()*20));
-			var dy = 0.03*h;
-			var str = '';
-			var tall = (h/2)+(random(0,0.4)*h);
+			var dy = 0.03*1;
+			var tall = (0.5)+(random(0,0.4));
 			for(var i = 0; i < n ; i++){
 				x = points[2].x + random(0,0.1);
 				while(x < points[3].x){
 					dx = Math.random()*(points[3].x-points[2].x);
 					x2 = Math.min(x + dx,points[4].x)-x;
-					str += 'M'+Math.round(w*x)+','+(tall)+'l'+Math.round(w*x2)+',0';
+					str += 'M'+(x).toFixed(2)+','+(tall).toFixed(2)+'l'+(x2).toFixed(2)+',0';
 					x += (dx + 0.02);
 				}
 				tall -= dy;
@@ -243,17 +241,17 @@ function Fish(id,w,h){
 			var x = points[2].x - r/2;
 			for(var i = 0; i < (points[3].x-points[2].x)/(r*2); i++){
 				x += f;
-				y = points[2].y - r - (i%2 == 0 ? r : 0);
+				y = points[2].y - (r - (i%2 == 0 ? r : 0))*(w/h);
 				for(var j = 0; j < (points[9].y-points[3].y)/(r*2); j++){
-					y += r*2;
-					if(Math.random() > 0.1) circles.push({'x': x*w, 'y': y*w, 'r': r*w});
+					y += r*2*(w/h);
+					if(Math.random() > 0.1) circles.push({'cx': x, 'cy': y, 'r': r});
 				}
 			}
 			return circles;
 		}else if(t == "belly"){
-			return 'M0,'+h+'L'+Math.round(points[2].x*w)+','+(h/2)+'L'+w+','+(h/2)+'L'+w+','+h+'Z';
+			return 'M0,1L'+(points[2].x)+',0.5L1,0.5L1,1Z';
 		}else if(t == "face"){
-			return 'M0,0L'+Math.round(points[2].x*w)+',0l0,'+h+'L0,'+h+'Z';
+			return 'M0,0L'+(points[2].x)+',0l0,1L0,1Z';
 		}else{
 			return '';
 		}
