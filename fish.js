@@ -120,7 +120,7 @@ function Fish(id,w,h){
 			else{
 				if(Math.random() > 0.7) patterns.push({'pattern':getPattern('lines'),'attr':{'stroke-width':0.01,'stroke':this.colour2,'fill':this.colour2,'opacity':0.6}});
 				else{
-					if(Math.random() > 0) patterns.push({'circles':getPattern('circles'),'attr':{'stroke-width':0.008,'stroke':this.colour2,'fill':'none','opacity':0.8}});
+					if(Math.random() > 0.7) patterns.push({'circles':getPattern('circles'),'attr':{'stroke-width':0.008,'stroke':this.colour2,'fill':'none','opacity':0.8}});
 				}
 			}
 		}
