@@ -7,15 +7,20 @@ S(document).ready(function(){
 	fish.update();
 	
 	// Add event to button
-	S('#new').on('click',function(e){ fish.create().draw(); });		
+	S('#new').on('click',function(e){ fish.create().draw(); }).html('<span class="line">N</span>ew');		
 
 	// Add event to button
-	S('#rounding').on('click',function(e){ fish.rounded = Math.random(); fish.paper.clear(); fish.draw(); });		
+	S('#rounding').on('click',function(e){ fish.rounded = Math.random(); fish.paper.clear(); fish.draw(); }).html('Change <span class="line">r</span>ounding');		
 
 	// Add event to button
 	if(fish.saveable) S('#save').on('click',function(e){ fish.save(); });
 	else S('#save').css({'display':'none'});		
 
+	S(document).on('keypress',function(e){
+		if(e.originalEvent.charCode==110) S('#new').trigger('click');           // N
+		else if(e.originalEvent.charCode==114) S('#rounding').trigger('click'); // R
+		else if(e.originalEvent.charCode==115) S('#save').trigger('click');     // S
+	});
 
 });
 
@@ -220,7 +225,7 @@ function Fish(id,w,h){
 		this.svg = this.paper.canvas.html();
 
 		// Update text of button
-		if(this.saveable) S('#save').html('Save SVG ('+niceSize(this.svg.length)+')')
+		if(this.saveable) S('#save').html('<span class="line">S</span>ave SVG ('+niceSize(this.svg.length)+')')
 
 		return this;
 	}
