@@ -12,6 +12,11 @@ S(document).ready(function(){
 	// Add event to button
 	S('#rounding').on('click',function(e){ fish.rounded = Math.random(); fish.paper.clear(); fish.draw(); });		
 
+	// Add event to button
+	if(fish.saveable) S('#save').on('click',function(e){ fish.save(); });
+	else S('#save').css({'display':'none'});		
+
+
 });
 
 function Fish(id,w,h){
@@ -19,6 +24,7 @@ function Fish(id,w,h){
 	this.aspectratio = w/h;
 	this.id = id;
 	this.rounded = Math.random();
+	this.saveable = (typeof Blob==="function");
 
 	var points,eye,patterns;
 	var path = "";
@@ -127,7 +133,30 @@ function Fish(id,w,h){
 
 		return this;
 	}
+	this.save = function(){
+
+		var textFileAsBlob = new Blob([this.svg], {type:'text/application/svg+xml'});
+		var fileNameToSaveAs = "fish.svg";
 	
+		function destroyClickedElement(event){ document.body.removeChild(event.target); }
+		var dl = document.createElement("a");
+		dl.download = fileNameToSaveAs;
+		dl.innerHTML = "Download File";
+		if(window.webkitURL != null){
+			// Chrome allows the link to be clicked
+			// without actually adding it to the DOM.
+			dl.href = window.webkitURL.createObjectURL(textFileAsBlob);
+		}else{
+			// Firefox requires the link to be added to the DOM
+			// before it can be clicked.
+			dl.href = window.URL.createObjectURL(textFileAsBlob);
+			dl.onclick = destroyClickedElement;
+			dl.style.display = "none";
+			document.body.appendChild(dl);
+		}
+		dl.click();
+		return this;
+	}
 	this.draw = function(){
 
 		// Move to start
@@ -177,12 +206,9 @@ function Fish(id,w,h){
 			for(var i = 0; i < patterns.length; i++){
 				patterns[i].attr['clip-path'] = 'shape';
 				if(patterns[i].pattern){
-					console.log(patterns[i].pattern)
 					this.paper.path(patterns[i].pattern).attr(patterns[i].attr).transform(this.transform);
 				}else if(patterns[i].circles){
-					for(var c = 0; c < patterns[i].circles.length; c++){
-						this.paper.circle(patterns[i].circles[c].cx,patterns[i].circles[c].cy,patterns[i].circles[c].r).attr(patterns[i].attr).transform(this.transform);
-					}
+					for(var c = 0; c < patterns[i].circles.length; c++) this.paper.circle(patterns[i].circles[c].cx,patterns[i].circles[c].cy,patterns[i].circles[c].r).attr(patterns[i].attr).transform(this.transform);
 				}
 			}
 		}
@@ -190,8 +216,20 @@ function Fish(id,w,h){
 		this.paper.circle(eye.x, eye.y, 0.015).attr({'stroke':0,'fill':'black'}).transform(this.transform);
 		
 		this.paper.draw();
-		return this;
 
+		this.svg = this.paper.canvas.html();
+
+		// Update text of button
+		if(this.saveable) S('#save').html('Save SVG ('+niceSize(this.svg.length)+')')
+
+		return this;
+	}
+	function niceSize(b){
+		if(b > 1e12) return (b/1e12).toFixed(2)+" TB";
+		if(b > 1e9) return (b/1e9).toFixed(2)+" GB";
+		if(b > 1e6) return (b/1e6).toFixed(2)+" MB";
+		if(b > 1e3) return (b/1e3).toFixed(2)+" kB";
+		return (b)+" bytes";
 	}
 	
 	function getPattern(t){
